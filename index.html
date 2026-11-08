@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>සෙත්සිරි Bakers - Cash Denomination Calculator</title>
+    <style>
+        :root {
+            --bg-color: #0f1115;
+            --card-bg: #181c24;
+            --accent-silver: #c0c5ce;
+            --accent-bright: #e2e8f0;
+            --border-color: #2a303c;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --success: #10b981;
+            --danger: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 15px;
+        }
+
+        .logo-container {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 10px auto;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 2px solid var(--accent-silver);
+            background: #000;
+        }
+
+        .logo-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .header h1 {
+            font-size: 1.2rem;
+            color: var(--accent-bright);
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .header p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .denomination-table {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .denom-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 8px 12px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .denom-label {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--accent-silver);
+            width: 100px;
+        }
+
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-qty {
+            background: #232833;
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-qty:active {
+            background: var(--accent-silver);
+            color: #000;
+        }
+
+        .denom-input {
+            width: 60px;
+            background: #0b0d10;
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            text-align: center;
+            font-size: 1rem;
+            padding: 6px;
+            border-radius: 6px;
+            outline: none;
+        }
+
+        .denom-input:focus {
+            border-color: var(--accent-silver);
+        }
+
+        .denom-total {
+            font-size: 0.95rem;
+            font-weight: bold;
+            color: var(--text-main);
+            width: 90px;
+            text-align: right;
+        }
+
+        .summary-card {
+            background: #111419;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .summary-row.total {
+            font-size: 1.1rem;
+            color: var(--accent-bright);
+            font-weight: bold;
+            border-top: 1px solid var(--border-color);
+            padding-top: 8px;
+            margin-top: 8px;
+            margin-bottom: 0;
+        }
+
+        .system-sales-input {
+            margin-bottom: 15px;
+        }
+
+        .system-sales-input label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+        }
+
+        .system-sales-input input {
+            width: 100%;
+            background: #111419;
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 8px;
+            border: none;
+            font-weight: bold;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-reset {
+            background: #2a303c;
+            color: var(--text-main);
+        }
+
+        .btn-copy {
+            background: var(--accent-silver);
+            color: #000;
+        }
+
+        .action-btn:active {
+            opacity: 0.8;
+        }
+
+        .difference-display {
+            text-align: center;
+            font-weight: bold;
+            font-size: 0.95rem;
+            margin-top: 10px;
+        }
+
+        .short { color: var(--danger); }
+        .excess { color: var(--success); }
+        .exact { color: var(--text-muted); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <div class="logo-container">
+            <!-- ඔබේ ලෝගු ෆයිල් එක හෝ ලින්ක් එක මෙහි යෙදිය හැක -->
+            <img src="7E2FFD6A-274C-46FD-B38B-7B94BD3B7F27_e0dbb9.jpeg" alt="Sethsiri Bakers Logo" onerror="this.src='https://via.placeholder.com/80?text=LOGO'">
+        </div>
+        <h1>සෙත්සිරි Bakers</h1>
+        <p>Cash Denomination & Daily Settlement</p>
+    </div>
+
+    <div class="denomination-table" id="denomTable">
+        <!-- Rows will be generated by JS -->
+    </div>
+
+    <div class="system-sales-input">
+        <label for="systemSales">စနစ် විකුණුම් මුදල (System Sales / Target):</label>
+        <input type="number" id="systemSales" placeholder="Rs. 0.00" oninput="calculateTotals()">
+    </div>
+
+    <div class="summary-card">
+        <div class="summary-row">
+            <span>මුළු මුදල් එකතුව (Total Cash):</span>
+            <span id="totalCashDisplay">Rs. 0.00</span>
+        </div>
+        <div class="summary-row">
+            <span>කාඩ් එකතුව (Card Total):</span>
+            <span id="totalCardDisplay">Rs. 0.00</span>
+        </div>
+        <div class="summary-row total">
+            <span>සම්පූර්ණ ආදායම (Grand Total):</span>
+            <span id="grandTotalDisplay">Rs. 0.00</span>
+        </div>
+        <div id="diffDisplay" class="difference-display exact">ශේෂය සමානයි</div>
+    </div>
+
+    <div class="actions">
+        <button class="action-btn btn-reset" onclick="resetForm()">రీසෙට් කරන්න (Reset)</button>
+        <button class="action-btn btn-copy" onclick="copyReport()">රිපෝට් එක කොපි කරන්න</button>
+    </div>
+</div>
+
+<script>
+    const denominations = [
+        { value: 5000, label: 'Rs. 5000', type: 'note' },
+        { value: 2000, label: 'Rs. 2000', type: 'note' },
+        { value: 1000, label: 'Rs. 1000', type: 'note' },
+        { value: 500,  label: 'Rs. 500',  type: 'note' },
+        { value: 100,  label: 'Rs. 100',  type: 'note' },
+        { value: 50,   label: 'Rs. 50',   type: 'note' },
+        { value: 20,   label: 'Rs. 20',   type: 'coin' },
+        { value: 1,    label: 'Rs. 1',    type: 'coin' },
+        { value: 'card', label: 'Card (POS)', type: 'card' }
+    ];
+
+    const tableContainer = document.getElementById('denomTable');
+
+    function initTable() {
+        tableContainer.innerHTML = '';
+        denominations.forEach((item, index) => {
+            const row = document.createElement('div');
+            row.className = 'denom-row';
+            
+            row.innerHTML = `
+                <span class="denom-label">${item.label}</span>
+                <div class="controls">
+                    <button class="btn-qty" onclick="adjustValue(${index}, -1)">-</button>
+                    <input type="number" class="denom-input" id="qty-${index}" value="" placeholder="0" oninput="calculateTotals()">
+                    <button class="btn-qty" onclick="adjustValue(${index}, 1)">+</button>
+                </div>
+                <span class="denom-total" id="sub-${index}">Rs. 0</span>
+            `;
+            tableContainer.appendChild(row);
+        });
+    }
+
+    function adjustValue(index, amount) {
+        const input = document.getElementById(`qty-${index}`);
+        let current = parseInt(input.value) || 0;
+        current += amount;
+        if (current < 0) current = 0;
+        input.value = current === 0 ? '' : current;
+        calculateTotals();
+    }
+
+    function calculateTotals() {
+        let totalCash = 0;
+        let totalCard = 0;
+
+        denominations.forEach((item, index) => {
+            const input = document.getElementById(`qty-${index}`);
+            const val = parseFloat(input.value) || 0;
+            const subtotal = item.value === 'card' ? val : val * item.value;
+            
+            document.getElementById(`sub-${index}`).innerText = 'Rs. ' + subtotal.toLocaleString('en-US');
+
+            if (item.value === 'card') {
+                totalCard += subtotal;
+            } else {
+                totalCash += subtotal;
+            }
+        });
+
+        const grandTotal = totalCash + totalCard;
+        const systemSales = parseFloat(document.getElementById('systemSales').value) || 0;
+
+        document.getElementById('totalCashDisplay').innerText = 'Rs. ' + totalCash.toLocaleString('en-US');
+        document.getElementById('totalCardDisplay').innerText = 'Rs. ' + totalCard.toLocaleString('en-US');
+        document.getElementById('grandTotalDisplay').innerText = 'Rs. ' + grandTotal.toLocaleString('en-US');
+
+        const diffDisplay = document.getElementById('diffDisplay');
+        if (systemSales > 0) {
+            const diff = grandTotal - systemSales;
+            if (diff < 0) {
+                diffDisplay.className = 'difference-display short';
+                diffDisplay.innerText = `අඩුවක් ඇත (Short): Rs. ${Math.abs(diff).toLocaleString('en-US')}`;
+            } else if (diff > 0) {
+                diffDisplay.className = 'difference-display excess';
+                diffDisplay.innerText = `වැඩිවීමක් ඇත (Excess): Rs. ${diff.toLocaleString('en-US')}`;
+            } else {
+                diffDisplay.className = 'difference-display exact';
+                diffDisplay.innerText = 'ගණන් කිරීම හරියටම සමානයි (Exact match)';
+            }
+        } else {
+            diffDisplay.className = 'difference-display exact';
+            diffDisplay.innerText = 'စနစ် විකුණුම් මුදල ඇතුළත් කරන්න';
+        }
+    }
+
+    function resetForm() {
+        denominations.forEach((_, index) => {
+            document.getElementById(`qty-${index}`).value = '';
+        });
+        document.getElementById('systemSales').value = '';
+        calculateTotals();
+    }
+
+    function copyReport() {
+        let report = "🥖 සෙත්සිරි Bakers - දෛනික මුදල් සටහන\n----------------------------------\n";
+        let totalCash = 0;
+        let totalCard = 0;
+
+        denominations.forEach((item, index) => {
+            const qty = parseFloat(document.getElementById(`qty-${index}`).value) || 0;
+            if (qty > 0) {
+                const sub = item.value === 'card' ? qty : qty * item.value;
+                report += `${item.label} x ${qty} = Rs. ${sub.toLocaleString('en-US')}\n`;
+                if (item.value === 'card') totalCard += sub;
+                else totalCash += sub;
+            }
+        });
+
+        const grand = totalCash + totalCard;
+        const sys = parseFloat(document.getElementById('systemSales').value) || 0;
+
+        report += `----------------------------------\n`;
+        report += `මුළු මුදල් (Cash): Rs. ${totalCash.toLocaleString('en-US')}\n`;
+        report += `කාඩ් මුදල් (Card): Rs. ${totalCard.toLocaleString('en-US')}\n`;
+        report += `සම්පූර්ණ ආදායම: Rs. ${grand.toLocaleString('en-US')}\n`;
+        if (sys > 0) {
+            report += `სနစ် විකුණුම්: Rs. ${sys.toLocaleString('en-US')}\n`;
+            const diff = grand - sys;
+            if (diff < 0) report += `අඩුව: Rs. ${Math.abs(diff).toLocaleString('en-US')}\n`;
+            else if (diff > 0) report += `වැඩිවීම: Rs. ${diff.toLocaleString('en-US')}\n`;
+            else report += `ශේෂය: නිවැරදියි\n`;
+        }
+
+        navigator.clipboard.writeText(report).then(() => {
+            alert('රිපෝට් එක කොපි කරගන්නා ලදී!');
+        });
+    }
+
+    window.onload = initTable;
+</script>
+
+</body>
+</html>
